@@ -1,0 +1,80 @@
+{
+  "name": "plutos-app-monitor",
+  "version": "1.0.0",
+  "description": "Production-grade, lightweight, real-time monitoring dashboard for Node.js, NestJS and Express applications.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "lint": "oxlint"
+  },
+  "keywords": [
+    "monitoring",
+    "dashboard",
+    "nestjs",
+    "express",
+    "nodejs",
+    "metrics",
+    "apm",
+    "performance",
+    "prometheus",
+    "redis"
+  ],
+  "author": "Plutos Team",
+  "license": "MIT",
+  "peerDependencies": {
+    "@nestjs/common": "^10.0.0 || ^11.0.0 || ^12.0.0",
+    "@nestjs/core": "^10.0.0 || ^11.0.0 || ^12.0.0",
+    "express": "^4.0.0 || ^5.0.0",
+    "ioredis": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@nestjs/common": {
+      "optional": true
+    },
+    "@nestjs/core": {
+      "optional": true
+    },
+    "express": {
+      "optional": true
+    },
+    "ioredis": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "prom-client": "^15.1.3",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@nestjs/common": "^12.0.1",
+    "@nestjs/core": "^12.0.1",
+    "@nestjs/platform-express": "^12.0.1",
+    "@types/express": "^5.0.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.0.0",
+    "@types/supertest": "^7.0.0",
+    "@types/ws": "^8.5.10",
+    "express": "^5.0.0",
+    "ioredis": "^5.4.1",
+    "jest": "^30.0.0",
+    "oxlint": "^1.58.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.4.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
+  }
+}
