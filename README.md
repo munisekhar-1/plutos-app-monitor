@@ -1,132 +1,152 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Plutos App Monitor (`plutos-app-monitor`)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+> A lightweight, fast, secure, production-grade monitoring dashboard for Node.js applications with first-class support for **NestJS** and **Express**.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+![Plutos Monitor Dashboard](https://www.plutos.one/images/new-home/logos/plutos%20white%20logo.svg)
 
-## Description
+---
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Features
 
-## Project setup
+- ⚡ **Lightweight & Fast**: Non-blocking instrumentation with minimal overhead on application requests.
+- 📊 **Comprehensive Metrics**: CPU, RAM, heap memory, event loop lag, process uptime, and restart history.
+- ⚡ **API Analytics**: Real-time RPS (current, average, peak), request counts, and latency percentiles (**P50, P95, P99**).
+- 🗄️ **Database Instrumentation**: Out-of-the-box performance tracking for **MongoDB**, **PostgreSQL**, **MySQL**, and **Redis**.
+- 🪵 **Live Logs**: Configurable real-time log streaming with automatic sensitive data redaction (`passwords`, `tokens`, `cookies`).
+- 🔄 **Cluster & Multi-Instance Support**: Optional Redis storage engine for distributed cluster aggregation. Automatically falls back to bounded in-memory storage if Redis is omitted.
+- 🎨 **Plutos Branded Dashboard**: Modern dark theme with left-rail icon navigation, custom Plutos branding, and responsive UI. Zero external CDN dependencies.
+- 🚨 **Alerting & Thresholds**: Configurable triggers for high CPU/RAM usage, event loop lag, and error spikes.
+- 📈 **Prometheus Metrics**: Built-in `/metrics` endpoint for Prometheus scraping.
+
+---
+
+## Installation
 
 ```bash
-$ npm install
+npm install plutos-app-monitor
 ```
 
-## Compile and run the project
+---
 
-```bash
-# development
-$ npm run start
+## Quick Start
 
-# watch mode
-$ npm run start:dev
+### 1. Express Integration
 
-# production mode
-$ npm run start:prod
+```javascript
+const express = require('express');
+const { PlutosMonitorServer } = require('plutos-app-monitor');
+
+const app = express();
+
+// Initialize Plutos Monitor
+const monitor = new PlutosMonitorServer({
+  title: 'My Express App',
+  path: '/monitor',
+  port: 3000,
+  auth: {
+    enabled: true,
+    username: 'admin',
+    password: 'SuperSecretPassword123!'
+  }
+});
+
+// Register Middleware
+app.use(monitor.getMiddleware());
+
+// Sample Endpoints
+app.get('/api/users', (req, res) => {
+  res.json([{ id: 1, name: 'Alice' }]);
+});
+
+app.listen(3000, () => {
+  console.log('App running on http://localhost:3000');
+  console.log('Dashboard available at http://localhost:3000/monitor');
+});
 ```
 
-## Run tests
+---
 
-```bash
-# unit tests
-$ npm run test
+### 2. NestJS Integration
 
-# e2e tests
-$ npm run test:e2e
+In your `app.module.ts`:
 
-# test coverage
-$ npm run test:cov
+```typescript
+import { Module } from '@nestjs/common';
+import { PlutosModule } from 'plutos-app-monitor';
+
+@Module({
+  imports: [
+    PlutosModule.forRoot({
+      path: '/monitor',
+      title: 'NestJS Plutos App',
+      auth: {
+        enabled: true,
+        username: 'admin',
+        password: 'SuperSecretPassword123!'
+      },
+      liveLogs: {
+        enabled: true,
+        maxEntries: 100,
+        redactKeys: ['password', 'authorization', 'cookie']
+      }
+    })
+  ]
+})
+export class AppModule {}
 ```
 
-## Deployment
+---
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Redis Configuration (Optional)
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+By default, `plutos-app-monitor` operates in **zero-config bounded in-memory mode**. To persist metrics across app restarts or aggregate metrics across a PM2 / Kubernetes multi-instance cluster, provide a Redis configuration or pass an existing Redis client instance:
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+```javascript
+const monitor = new PlutosMonitorServer({
+  path: '/monitor',
+  redis: {
+    enabled: true,
+    host: '127.0.0.1',
+    port: 6379,
+    password: 'redis_password',
+    prefix: 'plutos_monitor:'
+  }
+});
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Observability
+## Security Features
 
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
+- **Authentication by Default**: PBKDF2 password hashing (100k iterations) and secure session cookies.
+- **Redaction Engine**: Automatic masking of `password`, `token`, `secret`, `authorization`, `cookie`, and `apiKey` fields in headers and request parameters.
+- **Strict Headers**: Enforces `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, and strict CSP headers.
+- **Local Assets Only**: Bundles all CSS, JS, and SVG assets locally. No external CDN calls are made.
 
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
+---
 
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
+## Prometheus Metrics Endpoint
 
-To add it to this project, run this and approve the code it prints at [observe.nestjs.com/link](https://observe.nestjs.com/link) - signing up for free if you have no account:
+Enable the Prometheus exporter to scrape metrics at `/monitor/prometheus` (or custom endpoint):
 
-```bash
-$ npx @nestjs/observe link
+```javascript
+const monitor = new PlutosMonitorServer({
+  path: '/monitor',
+  prometheus: {
+    enabled: true,
+    path: '/prometheus'
+  }
+});
 ```
 
-It installs `@nestjs/observe`, wires it into `AppModule` and `main.ts`, and writes the app key and secret into `.env`, which every `nest start` script (`start`, `start:dev`, `start:debug`) then loads. In production, set `OBSERVE_APP_KEY` and `OBSERVE_APP_SECRET` in the environment instead.
+Metrics scrapable include:
+- `node_cpu_utilization_percent`
+- `node_memory_usage_bytes`
+- `http_requests_total`
+- `http_request_duration_ms`
 
-Or do it by hand:
-
-```bash
-$ npm install @nestjs/observe
-```
-
-Then follow the [setup guide](https://docs.nestjs.com/observability/sdk) - it takes a single import and an app key.
-
-The free plan needs no payment details and covers 300,000 events a month. You can also browse the [live demo](https://www.observe-demo.nestjs.com/dashboard) first - the whole dashboard over a busy service's data, with nothing to install.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+---
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+[MIT](LICENSE)
